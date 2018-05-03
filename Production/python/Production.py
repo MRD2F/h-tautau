@@ -47,6 +47,10 @@ options.register('dumpPython', False, VarParsing.multiplicity.singleton, VarPars
                         "Dump full config into stdout.")
 options.register('numberOfThreads', 1, VarParsing.multiplicity.singleton, VarParsing.varType.int,
                         "Number of threads.")
+options.register('againstEle', '', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+                        "")
+options.register('againstMuon', '', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+                                                "")
 
 options.parseArguments()
 
@@ -246,6 +250,8 @@ for channel in channels:
         saveGenBosonInfo        = cms.bool(options.saveGenBosonInfo),
         saveGenJetInfo          = cms.bool(options.saveGenJetInfo),
         rho                     = cms.InputTag('fixedGridRhoAll'),
+        againstEle              = cms.string(options.againstEle),
+        againstMuon              = cms.string(options.againstMuon)
     ))
 
     if period == 'Run2016':
