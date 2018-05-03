@@ -19,6 +19,14 @@ void TupleProducer_muTau::ProcessEvent(Cutter& cut)
     // Signal-like leptons selection
     const auto selectedMuons = CollectSignalMuons();
     cut(selectedMuons.size(), "muons");
+
+    const auto electronVetoCollection = CollectVetoElectrons();
+    const auto muonVetoCollection = CollectVetoMuons({ &selectedMuons.at(0) });
+    selection.electronVeto = electronVetoCollection.size();
+    cut(!selection.electronVeto, "vetoElectrons");
+    selection.muonVeto = muonVetoCollection.size();
+    cut(!selection.muonVeto, "vetoMuons");
+
     const auto selectedTaus = CollectSignalTaus();
     cut(selectedTaus.size(), "taus");
 
@@ -39,11 +47,11 @@ void TupleProducer_muTau::ProcessEvent(Cutter& cut)
 
     selection.SetHiggsCandidate(selected_higgs);
 
-    //Third-Lepton Veto
-    const auto electronVetoCollection = CollectVetoElectrons();
-    const auto muonVetoCollection = CollectVetoMuons({ &selection.higgs->GetFirstDaughter() });
-    selection.electronVeto = electronVetoCollection.size();
-    selection.muonVeto = muonVetoCollection.size();
+    // //Third-Lepton Veto
+    // const auto electronVetoCollection = CollectVetoElectrons();
+    // const auto muonVetoCollection = CollectVetoMuons({ &selection.higgs->GetFirstDaughter() });
+    // selection.electronVeto = electronVetoCollection.size();
+    // selection.muonVeto = muonVetoCollection.size();
 
     ApplyBaseSelection(selection, selection.higgs->GetDaughterMomentums());
     if(runSVfit)
@@ -109,10 +117,10 @@ void TupleProducer_muTau::SelectSignalTau(const TauCandidate& tau, Cutter& cut) 
     cut(dmFinding > decayModeFinding, "decayMode", dmFinding);
     auto packedLeadTauCand = dynamic_cast<const pat::PackedCandidate*>(tau->leadChargedHadrCand().get());
     cut(std::abs(packedLeadTauCand->dz()) < dz, "dz", packedLeadTauCand->dz());
-    cut(std::abs(tau->charge()) == absCharge, "charge", tau->charge());
+//    cut(std::abs(tau->charge()) == absCharge, "charge", tau->charge());
     if(productionMode == ProductionMode::hh) {
         cut(tau->tauID("againstElectronVLooseMVA6") > againstElectronVLooseMVA6, "againstElectron");
-        cut(tau->tauID("againstMuonTight3") > againstMuonTight3, "againstMuon");
+        cut(tau->tauID(againstMuon) > againstMuonTight3, "againstMuon");
     }
 }
 

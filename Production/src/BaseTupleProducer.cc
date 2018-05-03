@@ -55,7 +55,9 @@ BaseTupleProducer::BaseTupleProducer(const edm::ParameterSet& iConfig, analysis:
                  mayConsume<std::vector<l1extra::L1JetParticle>>(
                                                     iConfig.getParameter<edm::InputTag>("l1JetParticleProduct")),
                  iConfig.getParameter<std::string>("triggerCfg"),
-                 _channel)
+                 _channel),
+    againstEle(iConfig.getParameter<std::string>("againstEle")),
+    againstMuon(iConfig.getParameter<std::string>("againstMuon"))
 {
     root_ext::HistogramFactory<TH1D>::LoadConfig(
             edm::FileInPath("h-tautau/Production/data/histograms.cfg").fullPath());
@@ -87,8 +89,7 @@ void BaseTupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 {
     InitializeAODCollections(iEvent, iSetup);
     primaryVertex = vertices->ptrAt(0);
-    for(auto energyScale : eventEnergyScales) {
-        InitializeCandidateCollections(energyScale);
+        InitializeCandidateCollections(analysis::EventEnergyScale::Central);
         try {
             Cutter cut(&GetAnaData().Selection("events"));
             cut(true, "events");
@@ -96,7 +97,6 @@ void BaseTupleProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         } catch(cuts::cut_failed&){}
 
         GetAnaData().Selection("events").fill_selection();
-    }
 }
 
 void BaseTupleProducer::endJob()

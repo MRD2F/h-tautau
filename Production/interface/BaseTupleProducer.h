@@ -155,6 +155,9 @@ protected:
     std::shared_ptr<analysis::sv_fit::FitProducer> svfitProducer;
     std::shared_ptr<analysis::kin_fit::FitProducer> kinfitProducer;
     std::shared_ptr<RecoilCorrector> recoilPFMetCorrector;
+    std::string againstEle;
+    std::string againstMuon;
+
 
 private:
     static const bool enableThreadSafety;

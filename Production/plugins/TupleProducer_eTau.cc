@@ -19,6 +19,14 @@ void TupleProducer_eTau::ProcessEvent(Cutter& cut)
     // Signal-like leptons selection
     const auto selectedElectrons = CollectSignalElectrons();
     cut(selectedElectrons.size(), "electrons");
+
+    const auto electronVetoCollection = CollectVetoElectrons({ &selectedElectrons.at(0) });
+    const auto muonVetoCollection = CollectVetoMuons();
+    selection.electronVeto = electronVetoCollection.size();
+    cut(!selection.electronVeto, "vetoElectrons");
+    selection.muonVeto = muonVetoCollection.size();
+    cut(!selection.muonVeto, "vetoMuons");
+
     const auto selectedTaus = CollectSignalTaus();
     cut(selectedTaus.size(), "taus");
 
@@ -40,11 +48,12 @@ void TupleProducer_eTau::ProcessEvent(Cutter& cut)
 
     selection.SetHiggsCandidate(selected_higgs);
 
-    //Third-Lepton Veto
-    const auto electronVetoCollection = CollectVetoElectrons({ &selection.higgs->GetFirstDaughter() });
-    const auto muonVetoCollection = CollectVetoMuons();
-    selection.electronVeto = electronVetoCollection.size();
-    selection.muonVeto = muonVetoCollection.size();
+//    Third-Lepton Veto
+
+    // const auto electronVetoCollection = CollectVetoElectrons({ &selection.higgs->GetFirstDaughter() });
+    // const auto muonVetoCollection = CollectVetoMuons();
+    // selection.electronVeto = electronVetoCollection.size();
+    // selection.muonVeto = muonVetoCollection.size();
 
     ApplyBaseSelection(selection, selection.higgs->GetDaughterMomentums());
     if(runSVfit)
@@ -110,9 +119,9 @@ void TupleProducer_eTau::SelectSignalTau(const TauCandidate& tau, Cutter& cut) c
     cut(dmFinding > decayModeFinding, "decayMode", dmFinding);
     auto packedLeadTauCand = dynamic_cast<const pat::PackedCandidate*>(tau->leadChargedHadrCand().get());
     cut(std::abs(packedLeadTauCand->dz()) < dz, "dz", packedLeadTauCand->dz());
-    cut(std::abs(tau->charge()) == absCharge, "charge", tau->charge());
+//    cut(std::abs(tau->charge()) == absCharge, "charge", tau->charge());
     if(productionMode == ProductionMode::hh) {
-        cut(tau->tauID("againstElectronTightMVA6") > againstElectronTightMVA6, "againstElectron");
+        cut(tau->tauID(againstEle) > againstElectronTightMVA6, "againstElectron");
         cut(tau->tauID("againstMuonLoose3") > againstMuonLoose3, "againstMuon");
     }
 }
