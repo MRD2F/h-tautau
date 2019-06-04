@@ -82,10 +82,10 @@ if [ $MODE = "prod16" ] ; then
 
     # MET corrections
     #git cms-merge-topic cms-met:METRecipe_8020
-    run_cmd git cms-merge-topic cms-met:METRecipe_8020_for80Xintegration
+    #run_cmd git cms-merge-topic cms-met:METRecipe_8020_for80Xintegration
 
     # Tau ID
-    run_cmd git cms-merge-topic -u cms-tau-pog:CMSSW_8_0_X_tau-pog_tauIDOnMiniAOD-legacy-backport-81Xv2
+    #run_cmd git cms-merge-topic -u cms-tau-pog:CMSSW_8_0_X_tau-pog_tauIDOnMiniAOD-legacy-backport-81Xv2
 fi
 
 if [ $MODE = "prod17" ] ; then
@@ -106,12 +106,12 @@ if [ $MODE = "prod17" ] ; then
 #    cd data/RecoEgamma/ElectronIdentification/data
 #    git checkout CMSSW_9_4_0_pre3_TnP
     # Go back to the src/
-    run_cmd git cms-addpkg RecoMET/METFilters
-    run_cmd git cms-merge-topic cms-egamma:EgammaPostRecoTools
+    #run_cmd git cms-addpkg RecoMET/METFilters
+    #run_cmd git cms-merge-topic cms-egamma:EgammaPostRecoTools
     #Add DeepTau code from Tau POG repository (note "-u" option preventing checkout of unnecessary stuff)
-    run_cmd git cms-merge-topic -u cms-tau-pog:CMSSW_10_2_X_tau-pog_DeepTau2017v2
+    #run_cmd git cms-merge-topic -u cms-tau-pog:CMSSW_10_2_X_tau-pog_DeepTau2017v2
     #Add 2017v2 training file
-    run_cmd wget https://github.com/cms-tau-pog/RecoTauTag-TrainingFiles/raw/DeepTau2017v2_alone/DeepTauId/deepTau_2017v2p6_e6.pb -P RecoTauTag/TrainingFiles/data/DeepTauId
+    #run_cmd wget https://github.com/cms-tau-pog/RecoTauTag-TrainingFiles/raw/DeepTau2017v2_alone/DeepTauId/deepTau_2017v2p6_e6.pb -P RecoTauTag/TrainingFiles/data/DeepTauId
     #cd $CMSSW_BASE/src
 fi
 
