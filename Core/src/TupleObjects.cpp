@@ -146,7 +146,6 @@ TupleFatJet::TupleFatJet(const ntuple::Event& _event, size_t _jet_id)
 {
     if(jet_id >= event->fatJets_p4.size())
         throw analysis::exception("Fat jet id = %1% is out of range.") % jet_id;
-
     for(size_t n = 0; n < event->subJets_p4.size(); ++n) {
         if(event->subJets_parentIndex.at(n) == jet_id)
             sub_jets.push_back(TupleSubJet(_event, n));
@@ -156,9 +155,12 @@ TupleFatJet::TupleFatJet(const ntuple::Event& _event, size_t _jet_id)
 const LorentzVectorE& TupleFatJet::p4() const { return event->fatJets_p4.at(jet_id); }
 
 float TupleFatJet::m(MassType massType) const
-{
+{   std::cout << "Nutella" << '\n';
+    std::cout << "jet_id=" << jet_id << '\n';
+    std::cout << "event->fatJets_m_softDrop.size=" << event->fatJets_m_softDrop.size() << '\n';
     if(massType == MassType::SoftDrop) return event->fatJets_m_softDrop.at(jet_id);
     throw analysis::exception("Unsupported fat jet mass type");
+    std::cout << "Amarena" << '\n';
 }
 
 TupleObject::DiscriminatorResult TupleFatJet::jettiness(size_t tau_index) const
