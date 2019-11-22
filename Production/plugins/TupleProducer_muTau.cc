@@ -85,32 +85,44 @@ std::vector<BaseTupleProducer::TauCandidate> TupleProducer_muTau::CollectSignalT
 void TupleProducer_muTau::SelectSignalMuon(const MuonCandidate& muon, Cutter& cut) const
 {
     using namespace cuts::H_tautau_2016::MuTau::muonID;
-
+    std::cout << "a" << '\n';
     cut(true, "gt0_cand");
+    std::cout << "b" << '\n';
     const LorentzVector& p4 = muon.GetMomentum();
     static constexpr double pt_cut = cuts::hh_bbtautau_2017::MuTau::muonID::pt;
     cut(p4.pt() > pt_cut, "pt", p4.pt());
+    std::cout << "c" << '\n';
     cut(std::abs(p4.eta()) < eta, "eta", p4.eta());
+    std::cout << "d" << '\n';
     const double muon_dxy = std::abs(muon->muonBestTrack()->dxy(primaryVertex->position()));
     cut(muon_dxy < dxy, "dxy", muon_dxy);
+    std::cout << "e" << '\n';
     const double muon_dz = std::abs(muon->muonBestTrack()->dz(primaryVertex->position()));
     cut(muon_dz < dz, "dz", muon_dz);
+    std::cout << "f" << '\n';
     cut(muon->isMediumMuon(), "muonID");
+    std::cout << "g" << '\n';
 }
 
 void TupleProducer_muTau::SelectSignalTau(const TauCandidate& tau, Cutter& cut) const
 {
     using namespace cuts::H_tautau_2016::MuTau::tauID;
-
+// std::cout << "1" << '\n';
     cut(true, "gt0_cand");
+    // std::cout << "2" << '\n';
     const LorentzVector& p4 = tau.GetMomentum();
     cut(p4.Pt() > pt - BaseTupleProducer::pt_shift , "pt", p4.Pt());
+    // std::cout << "3" << '\n';
     cut(std::abs(p4.Eta()) < eta, "eta", p4.Eta());
+    // std::cout << "4" << '\n';
     auto packedLeadTauCand = dynamic_cast<const pat::PackedCandidate*>(tau->leadChargedHadrCand().get());
     cut(std::abs(packedLeadTauCand->dz()) < dz, "dz", packedLeadTauCand->dz());
+    // std::cout << "5" << '\n';
     cut(std::abs(tau->charge()) == absCharge, "charge", tau->charge());
+    // std::cout << "6" << '\n';
     bool iso_condition = PassMatchOrIsoSelection(tau);
     cut(iso_condition, "iso");
+    // std::cout << "7" << '\n';
 }
 
 

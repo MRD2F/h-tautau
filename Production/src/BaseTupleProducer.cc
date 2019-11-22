@@ -136,6 +136,11 @@ void BaseTupleProducer::InitializeAODCollections(const edm::Event& iEvent, const
 {
     edmEvent = &iEvent;
     eventId = iEvent.id();
+
+    // const EventIdentifier EventId(iEvent.run, iEvent.lumi, event.evt);
+    // const EventIdentifier EventIdTest(args.eventIdBranches());
+    // if(!(EventId == EventIdTest)) continue;
+
     triggerTools.Initialize(iEvent,!isMC && !isEmbedded);
 
     iEvent.getByToken(electronsMiniAOD_token, pat_electrons);
@@ -467,7 +472,6 @@ void BaseTupleProducer::FillGenParticleInfo()
     };
 
 
-
     if(saveGenParticleInfo){
     	for(const auto& particle : *genParticles) {
     	    fillGenInfo(&particle);
@@ -707,7 +711,6 @@ void BaseTupleProducer::SelectVetoMuon(const MuonCandidate& muon, Cutter& cut,
                                        bool isTightSelection) const
 {
     using namespace cuts::H_tautau_2016::muonVeto;
-
     cut(true, "gt0_cand");
     const LorentzVector& p4 = muon.GetMomentum();
     cut(p4.pt() > pt, "pt", p4.pt());
@@ -731,7 +734,6 @@ void BaseTupleProducer::SelectVetoMuon(const MuonCandidate& muon, Cutter& cut,
 void BaseTupleProducer::SelectJet(const JetCandidate& jet, Cutter& cut) const
 {
     using namespace cuts::H_tautau_2016::jetID;
-
     cut(true, "gt0_cand");
     const LorentzVector& p4 = jet.GetMomentum();
     cut(p4.Pt() > pt - pt_safety, "pt", p4.Pt());

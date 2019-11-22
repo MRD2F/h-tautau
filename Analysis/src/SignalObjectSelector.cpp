@@ -101,6 +101,42 @@ boost::optional<size_t> SignalObjectSelector::GetHiggsCandidateIndex(EventCandid
     return boost::optional<size_t>();
 }
 
+// boost::optional<size_t> SignalObjectSelector::GetHiggsCandidateIndex(EventCandidate& event_candidate) const
+// {
+//     const ntuple::Event& event = event_candidate.GetEvent();
+//     // std::vector<ntuple::TupleLepton> lepton_candidates;
+//     // for(size_t n = 0; n < event.lep_p4.size(); ++n)
+//     //     lepton_candidates.emplace_back(event, n);
+//     const Channel channel = static_cast<Channel>(event.channelId);
+//     std::vector<size_t> higgs_candidates;
+//     for(size_t n = 0; n < event.first_daughter_indexes.size(); ++n){
+//
+//         // if(channel == Channel::MuMu)
+//              // std::cout << "nutella" << '\n';
+//         //     auto& first_leg = event_candidate.GetLeptons().at(0);
+//         //     auto& second_leg = event_candidate.GetLeptons().at(1);
+//         // }
+//         // else if(channel != Channel::MuMu){
+//         //     if(event.first_daughter_indexes.at(n) >=event_candidate.GetLeptons().size() ||
+//         //         event.second_daughter_indexes.at(n) >=event_candidate.GetLeptons().size())
+//         //         throw analysis::exception("Daughter indexes greater than lepton size.");
+//         //     auto& first_leg = event_candidate.GetLeptons().at(event.first_daughter_indexes.at(n));
+//         //     auto& second_leg = event_candidate.GetLeptons().at(event.second_daughter_indexes.at(n));
+//         //     std::cout << "event_candidate.GetLeptons().size()=" << event_candidate.GetLeptons().size()<< '\n';
+//         //     std::cout << "event.first_daughter_indexes.at(n)=" << event.first_daughter_indexes.at(n) << '\n';
+//         // }
+//         if(event_candidate.GetLeptons().size() < 2) continue;
+//         auto& first_leg = event_candidate.GetLeptons().at(0);
+//         auto& second_leg = event_candidate.GetLeptons().at(1);
+//
+//         if(event_candidate.GetLeptons().size() < 2)
+//                 throw analysis::exception("Daughter indexes greater than lepton size.");
+//         if(ROOT::Math::VectorUtil::DeltaR2(first_leg.GetMomentum(), second_leg.GetMomentum()) <= DR2_leptons) continue;
+//         if(!PassLeptonSelection(first_leg,channel,1)) continue;
+//         if(!PassLeptonSelection(second_leg,channel,2)) continue;
+//         higgs_candidates.push_back(n);
+//     }
+
 bool SignalObjectSelector::PassLeptonVetoSelection(const ntuple::Event& event) const
 {
     for(unsigned n = 0; n < event.other_lepton_p4.size(); ++n){
@@ -337,6 +373,7 @@ SignalObjectSelector::SelectedSignalJets SignalObjectSelector::SelectSignalJets(
 
     const auto CreateJetInfo = [&](bool useBTag) -> auto {
         std::vector<analysis::jet_ordering::JetInfo<LorentzVector>> jet_info_vector;
+
         for(size_t n = 0; n < event_candidate.GetJets().size(); ++n) {
             const size_t first_leg_id = event.first_daughter_indexes.at(selected_higgs_index);
             const auto& first_leg = event_candidate.GetLeptons().at(first_leg_id).GetMomentum();
@@ -349,7 +386,7 @@ SignalObjectSelector::SelectedSignalJets SignalObjectSelector::SelectSignalJets(
             analysis::DiscriminatorIdResults jet_pu_id(event_candidate.GetJets().at(n)->GetPuId());
             if(!PassEcalNoiceVetoJets(event_candidate.GetJets().at(n).GetMomentum(), period, jet_pu_id)) continue;
             if(!(event_candidate.GetJets().at(n).GetMomentum().pt() < 50 && jet_pu_id.Passed(analysis::DiscriminatorWP::Loose))) continue;
-//            if(useBTag && (event.jets_pu_id.at(n) & (1 << 2)) == 0) continue;
+            if(useBTag && (event.jets_pu_id.at(n) & (1 << 2)) == 0) continue;
 
             const double tag = useBTag ? bTagger.BTag(event,n,uncertainty_source,scale,base_ordering) : event_candidate.GetJets().at(n).GetMomentum().Pt();
             jet_info_vector.emplace_back(event_candidate.GetJets().at(n).GetMomentum(),n,tag);
@@ -359,7 +396,8 @@ SignalObjectSelector::SelectedSignalJets SignalObjectSelector::SelectSignalJets(
 
     auto jet_info_vector = CreateJetInfo(true);
     auto bjets_ordered = jet_ordering::OrderJets(jet_info_vector,true,bjet_pt_cut,bjet_eta_cut);
-    selected_signal_jets.n_bjets = bjets_ordered.size();
+    auto bjets_all = jet_ordering::OrderJets(jet_info_vector,true,bjet_pt_cut,bjet_eta_cut);
+    selected_signal_jets.n_bjets = bjets_all.size();
     if(bjets_ordered.size() >= 1){
         selected_signal_jets.selectedBjetPair.first = bjets_ordered.at(0).index;
     }
