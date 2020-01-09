@@ -32,10 +32,13 @@ public:
     template<typename LorentzVector>
     double GetTriggerEff(const LorentzVector& p4, bool isData) const
     {
-        if(isData)
+        if(isData){
+            // std::cout << "isData_eff=" << triggerSingle->get_EfficiencyData(p4.pt(), p4.eta()) << '\n';
             return triggerSingle->get_EfficiencyData(p4.pt(), p4.eta());
-        else
-            return triggerSingle->get_EfficiencyMC(p4.pt(), p4.eta());
+        }
+        else{
+            // std::cout << "isMC_eff=" << triggerSingle->get_EfficiencyMC(p4.pt(), p4.eta()) << '\n';
+            return triggerSingle->get_EfficiencyMC(p4.pt(), p4.eta());}
     }
 
     template<typename LorentzVector>
@@ -166,6 +169,7 @@ private:
     std::shared_ptr<TauIDSFTool> tauIdWeight;
     DiscriminatorWP tau_iso_wp;
     bool applyTauId;
+    Period period;
 };
 
 } // namespace mc_corrections

@@ -111,6 +111,7 @@ EventWeights::EventWeights(Period period, JetOrdering jet_ordering, Discriminato
                         FullLeptonName("Electron/Run2018/Electron_Run2018_Ele32orEle35.root"),
                         "",
                         FullLeptonName("Muon/Run2018/Muon_Run2018_IdIso.root"),
+                        // FullLeptonName("Muon/Run2018/Muon_Run2018_IsoMu20.root"),
                         FullLeptonName("Muon/Run2018/Muon_Run2018_IsoMu24orIsoMu27.root"),
                         "",
                         FullTriggerName("2018_tauTriggerEff_DeepTau2017v2p1.root"),
