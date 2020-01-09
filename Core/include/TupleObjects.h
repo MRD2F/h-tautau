@@ -42,6 +42,7 @@ public:
     analysis::LegType leg_type() const;
     bool passConversionVeto() const;
     bool passEleIso(DiscriminatorWP wp) const;
+    bool passMuonId(DiscriminatorWP wp) const;
 
     bool Passed(analysis::TauIdDiscriminator tauIdDiscriminator, DiscriminatorWP wp) const;
     bool PassedOldDecayMode() const;
@@ -66,6 +67,7 @@ public:
     DiscriminatorResult csv() const;
     DiscriminatorResult deepcsv() const;
     DiscriminatorResult deepFlavour() const;
+    RealNumber hh_tag(analysis::UncertaintySource unc_source, analysis::UncertaintyScale unc_scale) const;
     Integer partonFlavour() const;
     Integer hadronFlavour() const;
     RealNumber rawf() const;

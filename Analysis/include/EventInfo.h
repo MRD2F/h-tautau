@@ -17,6 +17,7 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 #include "h-tautau/Cuts/include/H_tautau_2017_baseline.h"
 #include "h-tautau/JetTools/include/BTagger.h"
 #include "h-tautau/Analysis/include/EventCandidate.h"
+#include "h-tautau/Analysis/include/EventCacheProvider.h"
 
 #include "SVfitAnaInterface.h"
 #include "KinFitInterface.h"
@@ -50,7 +51,7 @@ private:
 class EventInfoBase {
 public:
     using Event = ntuple::Event;
-    using JetPair = ntuple::JetPair;
+    using LegPair = ntuple::LegPair;
     using HiggsBBCandidate = CompositeCandidate<JetCandidate, JetCandidate>;
     using Mutex = std::recursive_mutex;
     using Lock = std::lock_guard<Mutex>;
@@ -87,6 +88,7 @@ public:
 
     size_t GetNJets() const;
     size_t GetNFatJets() const;
+    size_t GetHttIndex() const;
     const SignalObjectSelector::SelectedSignalJets& GetSelectedSignalJets() const;
     Period GetPeriod() const;
     JetOrdering GetJetOrdering() const;
@@ -96,7 +98,9 @@ public:
                              bool applyPu = false, bool passBtag = false,
                              JetOrdering jet_ordering = JetOrdering::DeepCSV,
                              const std::set<size_t>& jet_to_exclude_indexes = {},
-                             double low_eta_cut = 0);
+                             double low_eta_cut = 0,
+                             analysis::UncertaintySource unc_source = analysis::UncertaintySource::None,
+                             analysis::UncertaintyScale unc_scale = analysis::UncertaintyScale::Central);
 
     double GetHT(bool includeHbbJets, bool apply_pt_eta_cut);
     const FatJetCollection& GetFatJets();
@@ -108,8 +112,8 @@ public:
     size_t GetLegIndex(const size_t leg_id);
     static bool PassDefaultLegSelection(const ntuple::TupleLepton& lepton, Channel channel);
 
-    const kin_fit::FitResults& GetKinFitResults();
-    const sv_fit_ana::FitResults& GetSVFitResults();
+    const kin_fit::FitResults& GetKinFitResults(bool allow_calc = false);
+    const sv_fit_ana::FitResults& GetSVFitResults(bool allow_calc = false);
 
     LorentzVector GetResonanceMomentum(bool useSVfit, bool addMET);
     double GetMT2();
@@ -154,14 +158,10 @@ public:
 
     const JetCollection& GetJets();
     const MET& GetMET();
-    EventEnergyScale GetEnergyScale() const;
-
-
-
-
 
 protected:
     EventCandidate event_candidate;
+    EventCacheProvider eventCacheProvider;
     const SummaryInfo* summaryInfo;
     TriggerResults triggerResults;
     std::shared_ptr<Mutex> mutex;
@@ -188,6 +188,7 @@ boost::optional<EventInfoBase> CreateEventInfo(const ntuple::Event& event,
                                                const SummaryInfo* summaryInfo = nullptr,
                                                Period period = analysis::Period::Run2017,
                                                JetOrdering jet_ordering = JetOrdering::DeepCSV,
+                                               bool is_sync = false,
                                                UncertaintySource uncertainty_source = UncertaintySource::None,
                                                UncertaintyScale scale = UncertaintyScale::Central);
 

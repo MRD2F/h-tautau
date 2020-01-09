@@ -12,6 +12,12 @@ file(GLOB_RECURSE HTT_UTILITIES_SRC "${CMSSW_BASE_SRC}/HTT-utilities/*.cc")
 add_library(HTT-utilities STATIC ${HTT_UTILITIES_SRC})
 set_source_files_properties(${HTT_UTILITIES_SRC} PROPERTIES COMPILE_FLAGS "-w")
 
+file(GLOB_RECURSE TauAnalysisTool_SRC "${CMSSW_BASE_SRC}/TauAnalysisTools/*.cc")
+add_library(TauAnalysisTools STATIC ${TauAnalysisTool_SRC})
+
+file(GLOB_RECURSE TauPOG_SRC "${CMSSW_BASE_SRC}/TauPOG/TauIDSFs/src/*.cc")
+add_library(TauPOG STATIC ${TauPOG_SRC})
+
 file(GLOB_RECURSE HH_KINFIT2_SRC "${CMSSW_BASE_SRC}/HHKinFit2/*.cpp")
 add_library(HHKinFit2 STATIC ${HH_KINFIT2_SRC})
 target_include_directories(HHKinFit2 PRIVATE "${CMSSW_BASE_SRC}/HHKinFit2/HHKinFit2/interface")
@@ -52,7 +58,7 @@ include_directories(SYSTEM ${Tensorflow-cc_INCLUDE_DIRS} ${Tensorflow-c_INCLUDE_
 target_link_libraries("nutella" ${Tensorflow-cc_LIBRARIES} ${Tensorflow-c_LIBRARIES} ${Protobuf_LIBRARIES} pthread $ENV{CMSSW_RELEASE_BASE}/lib/slc6_amd64_gcc630/libPhysicsToolsTensorFlow.so)
 
 foreach(exe_name ${EXE_LIST})
-    target_link_libraries("${exe_name}" h-tautau AnalysisTools HTT-utilities SVfit HHKinFit2)
+    target_link_libraries("${exe_name}" h-tautau AnalysisTools HTT-utilities SVfit HHKinFit2 TauAnalysisTools TauPOG)
 endforeach()
 
 add_library(h-tautau STATIC ${SOURCE_LIST})

@@ -95,19 +95,22 @@ namespace jet_ordering {
 
 class SignalObjectSelector {
 public:
-    using JetPair = ntuple::JetPair;
+    using LegPair = ntuple::LegPair;
     using LepCandidate = LeptonCandidate<ntuple::TupleLepton>;
 
     SignalObjectSelector(SignalMode _mode);
 
-    bool PassLeptonSelection(const LepCandidate& lepton, Channel channel) const;
-    boost::optional<size_t> GetHiggsCandidateIndex(EventCandidate& event_candidate) const;
+    bool PassLeptonSelection(const LepCandidate& lepton, Channel channel, const size_t legId, bool is_sync = false) const;
+    boost::optional<size_t> GetHiggsCandidateIndex(EventCandidate& event_candidate, bool is_sync = false) const;
     bool PassLeptonVetoSelection(const ntuple::Event& event) const;
     bool PassMETfilters(const ntuple::Event& event, Period period, bool is_Data) const;
+    TauIdDiscriminator GetTauVSjetDiscriminator() const;
+    std::pair<TauIdDiscriminator, DiscriminatorWP> GetTauVSeDiscriminator(analysis::Channel) const;
+    std::pair<TauIdDiscriminator, DiscriminatorWP> GetTauVSmuDiscriminator(analysis::Channel) const;
 
     struct SelectedSignalJets{
-        JetPair selectedBjetPair;
-        JetPair selectedVBFjetPair;
+        LegPair selectedBjetPair;
+        LegPair selectedVBFjetPair;
         size_t n_bjets;
 
         SelectedSignalJets();
@@ -120,7 +123,9 @@ public:
     static SelectedSignalJets SelectSignalJets(EventCandidate& event_candidate,
                                                const analysis::Period& period,
                                                analysis::JetOrdering jet_ordering,
-                                               size_t selected_higgs_index);
+                                               size_t selected_higgs_index,
+                                               analysis::UncertaintySource unc_source,
+                                               analysis::UncertaintyScale unc_scale);
 
      template<typename LorentzVector>
      static bool PassEcalNoiceVetoJets(const LorentzVector& jet_p4, Period period, DiscriminatorIdResults jets_pu_id)
@@ -135,10 +140,10 @@ public:
      }
 
 private:
-    bool PassHTT_LeptonSelection(const LepCandidate& lepton, Channel channel, bool is_sync) const;
+    bool PassHTT_LeptonSelection(const LepCandidate& lepton, Channel channel, bool is_sync = false) const;
     bool PassTauPOG_LeptonSelection(const LepCandidate& lepton, Channel channel) const;
-    bool PassHH_LeptonSelection(const LepCandidate& lepton, Channel channel) const;
-    bool PassHH_legacy_LeptonSelection(const LepCandidate& lepton, Channel channel) const;
+    bool PassHH_LeptonSelection(const LepCandidate& lepton, Channel channel, size_t legId,  bool is_sync = false) const;
+    bool PassHH_legacy_LeptonSelection(const LepCandidate& lepton, Channel channel, size_t legId) const;
     bool PassSkimmer_LeptonSelection(const LepCandidate& lepton) const;
     bool PassTauPOG_Skimmer_LeptonSelection(const LepCandidate& lepton) const;
 

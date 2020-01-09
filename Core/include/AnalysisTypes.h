@@ -35,14 +35,6 @@ inline const ChannelLegTypes GetChannelLegTypes(Channel channel)
     return iter->second;
 }
 
-enum class EventEnergyScale { Central = 0, TauUp = 1, TauDown = 2, JetUp = 3, JetDown = 4, TopPtUp = 5, TopPtDown = 6 };
-ENUM_NAMES(EventEnergyScale) = {
-    { EventEnergyScale::Central, "Central" },
-    { EventEnergyScale::TauUp, "TauUp" }, { EventEnergyScale::TauDown, "TauDown" },
-    { EventEnergyScale::JetUp, "JetUp" }, { EventEnergyScale::JetDown, "JetDown" },
-    { EventEnergyScale::TopPtUp, "TopPtUp" }, { EventEnergyScale::TopPtDown, "TopPtDown" },
-};
-
 enum class UncertaintyScale { Central = 0, Up = 1, Down = -1 };
 ENUM_NAMES(UncertaintyScale) = {
     { UncertaintyScale::Central, "Central" }, { UncertaintyScale::Up, "Up" }, { UncertaintyScale::Down, "Down" }
@@ -55,7 +47,8 @@ enum class UncertaintySource { None = 0, TauES = 1, Total = 2, TopPt = 3, Absolu
      RelativePtBB = 22, RelativePtEC1 = 23, RelativePtEC2 = 24, RelativePtHF = 25, RelativeBal = 26,
      RelativeFSR = 27, PileUpDataMC = 28, PileUpPtRef = 29, PileUpPtBB = 30, PileUpPtEC1 = 31, PileUpPtEC2 = 32,
      PileUpPtHF = 33, SubTotalPileUp = 34, SubTotalRelative = 35, SubTotalPt = 36, SubTotalScale = 37,
-     SubTotalAbsolute = 38, SubTotalMC = 39, TotalNoFlavor = 40, TotalNoTime = 41, TotalNoFlavorNoTime = 42};
+     SubTotalAbsolute = 38, SubTotalMC = 39, TotalNoFlavor = 40, TotalNoTime = 41, TotalNoFlavorNoTime = 42,
+     EleFakingTauES = 43 };
 ENUM_NAMES(UncertaintySource) = {
     { UncertaintySource::None, "None" }, { UncertaintySource::TauES, "TauES" },
     { UncertaintySource::Total, "Total" }, { UncertaintySource::TopPt, "TopPt" },
@@ -96,10 +89,12 @@ ENUM_NAMES(UncertaintySource) = {
     { UncertaintySource::SubTotalMC, "SubTotalMC" },
     { UncertaintySource::TotalNoFlavor, "TotalNoFlavor"},
     { UncertaintySource::TotalNoTime, "TotalNoTime"},
-    { UncertaintySource::TotalNoFlavorNoTime, "TotalNoFlavorNoTime"}
+    { UncertaintySource::TotalNoFlavorNoTime, "TotalNoFlavorNoTime"},
+    { UncertaintySource::EleFakingTauES, "EleFakingTauES"}
 };
 
-using EventEnergyScaleSet = EnumNameMap<EventEnergyScale>::EnumEntrySet;
+const std::set<UncertaintyScale>& GetAllUncertaintyScales();
+const std::set<UncertaintyScale>& GetActiveUncertaintyScales(UncertaintySource unc_source);
 
 enum class DiscriminatorWP { VVVLoose = 0, VVLoose = 1, VLoose = 2, Loose = 3, Medium = 4, Tight = 5,
                              VTight = 6, VVTight = 7, VVVTight = 8 };

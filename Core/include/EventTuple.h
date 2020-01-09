@@ -167,6 +167,11 @@ using Point3D = analysis::Point3D_Float;
     VAR(std::vector<Int_t>, kinFit_convergence) /* KinFit convergence code */\
     VAR(std::vector<Int_t>, kinFit_unc_source) /* kinFit */ \
     VAR(std::vector<Int_t>, kinFit_unc_scale) /* kinFit */ \
+    /* Jet score Variables */ \
+    VAR(std::vector<size_t>, jet_hh_score_index) /* jet score indexes */ \
+    VAR(std::vector<Int_t>, jet_hh_score_unc_scale) /* jet score scale */ \
+    VAR(std::vector<Int_t>, jet_hh_score_unc_source) /* jet score source */ \
+    VAR(std::vector<Float_t>, jet_hh_score_value) /* jet score value */ \
     /* Generator level information */\
     VAR(UInt_t, lhe_n_partons) \
     VAR(UInt_t, lhe_n_c_partons) \
@@ -207,6 +212,12 @@ using Point3D = analysis::Point3D_Float;
     /* Skimmer Variables */\
     VAR(UInt_t, file_desc_id) /* File id in TupleSkimmer. */ \
     VAR(UInt_t, split_id) /* Split id in TupleSkimmer. */ \
+    /* Gen Study Variables */\
+    VAR(Int_t, sample_type)  \
+    VAR(Int_t, sample_year) \
+    VAR(Int_t, mass_point)  \
+    VAR(Int_t, spin)  \
+    VAR(Int_t, node)  \
     /**/
 
 #define VAR(type, name) DECLARE_BRANCH_VARIABLE(type, name)
@@ -234,12 +245,11 @@ template<typename T>
 constexpr T DefaultFillValue() { return std::numeric_limits<T>::lowest(); }
 
 enum class TreeState { Full, Skimmed };
-using JetPair = std::pair<size_t, size_t>;
+using LegPair = std::pair<size_t, size_t>;
 
-size_t NumberOfCombinationPairs(size_t n_jets);
-size_t CombinationPairToIndex(const JetPair& pair, size_t n_jets);
-JetPair CombinationIndexToPair(size_t index, size_t n_jets);
-JetPair UndefinedJetPair();
+size_t LegPairToIndex(const LegPair& pair);
+LegPair LegIndexToPair(size_t index);
+LegPair UndefinedLegPair();
 std::shared_ptr<EventTuple> CreateEventTuple(const std::string& name, TDirectory* directory,
                                              bool readMode, TreeState treeState);
 } // namespace ntuple

@@ -9,6 +9,7 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 #include "h-tautau/Core/include/AnalysisTypes.h"
 #include "h-tautau/Analysis/include/TauUncertainties.h"
 #include "h-tautau/JetTools/include/JECUncertaintiesWrapper.h"
+#include "AnalysisTools/Core/include/Tools.h"
 
 namespace analysis {
     using LepCandidate = LeptonCandidate<ntuple::TupleLepton>;
@@ -23,14 +24,16 @@ class EventCandidate {
 public:
 
     EventCandidate(const ntuple::Event& _event, UncertaintySource _uncertainty_source,
-    UncertaintyScale _scale, Period _period);
+                   UncertaintyScale _scale, Period _period, TauIdDiscriminator _tau_id_discriminator,
+                   TauIdDiscriminator _ele_id_discriminator);
 
     EventCandidate(const EventCandidate& ) = default; //copy constructor
     EventCandidate(EventCandidate&& ) = default; // move constructor
 
     EventCandidate& operator= ( const EventCandidate& ) = default; //assignment
 
-    static void InitializeJecUncertainty(const std::string& file_uncertainty_source);
+    static void InitializeJecUncertainties(Period period, const std::string& working_path);
+    static const jec::JECUncertaintiesWrapper& GetJecUncertainties();
 
     const LepCollection& GetLeptons();
     const JetCollection& GetJets();
@@ -57,6 +60,8 @@ private:
     std::shared_ptr<std::vector<JetCandidate>> jet_candidates;
     std::shared_ptr<MET> met;
     static std::shared_ptr<jec::JECUncertaintiesWrapper> jecUncertainties;
+    TauIdDiscriminator tau_id_discriminator;
+    TauIdDiscriminator ele_id_discriminator;
 };
 
 } // namespace analysis
