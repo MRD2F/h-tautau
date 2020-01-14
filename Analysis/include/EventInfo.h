@@ -5,7 +5,6 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 
 #include "AnalysisTools/Core/include/EventIdentifier.h"
 #include "AnalysisTools/Core/include/RootExt.h"
-
 #include "h-tautau/Core/include/AnalysisTypes.h"
 #include "h-tautau/Core/include/Candidate.h"
 #include "h-tautau/Core/include/EventTuple.h"
@@ -18,6 +17,7 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 #include "h-tautau/JetTools/include/BTagger.h"
 #include "h-tautau/Analysis/include/EventCandidate.h"
 #include "h-tautau/Analysis/include/EventCacheProvider.h"
+#include "HH-btag/include/HH_BTag.h"
 
 #include "SVfitAnaInterface.h"
 #include "KinFitInterface.h"
@@ -82,6 +82,10 @@ public:
     const SummaryInfo& GetSummaryInfo() const;
     static const kin_fit::FitProducer& GetKinFitProducer();
     static const sv_fit_ana::FitProducer& GetSVFitProducer();
+    const std::vector<float>& GetJetScore(double pt_cut, double eta_cut, JetOrdering jet_ordering,
+                                          bool apply_pu, bool pass_btag, double low_eta_cut = 0,
+                                          analysis::UncertaintySource unc_source = analysis::UncertaintySource::None,
+                                          analysis::UncertaintyScale unc_scale = analysis::UncertaintyScale::Central);
 
     // virtual const Candidate& GetLeg(size_t /*leg_id*/);
     // virtual LorentzVector GetHiggsTTMomentum(bool /*useSVfit*/);

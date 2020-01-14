@@ -155,6 +155,8 @@ private:
                         if(!HH_indexes.count(hh_pair) && args.runKinFit() && event_info_base->HasBjetPair()){
                             cacheSummary().numberOfTimesKinFit++;
                             const kin_fit::FitResults& result = event_info_base->GetKinFitResults(true);
+                            const std::vector<float>& jet_scores = event_info_base->GetJetScore(20, 2.3,
+                                JetOrdering::DeepFlavour, true, true);
                             cacheTuple().kinFit_Higgs_index.push_back(selected_htt_index);
                             cacheTuple().kinFit_jetPairId.push_back(selected_hbb_index);
                             cacheTuple().kinFit_m.push_back(static_cast<Float_t>(result.mass));

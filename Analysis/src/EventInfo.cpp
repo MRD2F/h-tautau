@@ -266,6 +266,60 @@ const sv_fit_ana::FitResults& EventInfoBase::GetSVFitResults(bool allow_calc)
     return *svfit_results;
 }
 
+const std::vector<float>& EventInfoBase::GetJetScore(double pt_cut, double eta_cut, JetOrdering jet_ordering, bool apply_pu, bool pass_btag,
+                                                     double low_eta_cut,
+                                                     analysis::UncertaintySource unc_source,
+                                                     analysis::UncertaintyScale unc_scale/* double pt_cut, double eta_cut, bool applyPu,
+                                                       bool passBtag, JetOrdering jet_ordering,
+                                                       const std::set<size_t>& jet_to_exclude_indexes,
+                                                       double low_eta_cut,
+                                                       analysis::UncertaintySource unc_source,
+                                                       analysis::UncertaintyScale unc_scale */)
+{
+    Lock lock(*mutex);
+    const ntuple::Event& event = event_candidate.GetEvent();
+    const auto& jets = SelectJets(pt_cut, eta_cut, true, false, jet_ordering);
+
+    // BTagger bTagger(period, jet_ordering);
+    // bool base_ordering = jet_ordering != analysis::JetOrdering::HHJetTag;
+    // const JetCollection& all_jets = GetJets();
+    // const ntuple::Event& event = event_candidate.GetEvent();
+    // JetCollection selected_jets;
+    // std::vector<analysis::jet_ordering::JetInfo<LorentzVector>> jet_info_vector;
+    // for(size_t n = 0; n < all_jets.size(); ++n) {
+    //     const JetCandidate& jet = all_jets.at(n);
+    //     if(ROOT::Math::VectorUtil::DeltaR(GetLeg(1).GetMomentum(), jet.GetMomentum()) <= cuts::H_tautau_2016::DeltaR_betweenSignalObjects) continue;
+    //     if(ROOT::Math::VectorUtil::DeltaR(GetLeg(2).GetMomentum(), jet.GetMomentum()) <= cuts::H_tautau_2016::DeltaR_betweenSignalObjects) continue;
+    //     analysis::DiscriminatorIdResults jet_pu_id = jet->GetPuId();
+    //     if(!SignalObjectSelector::PassEcalNoiceVetoJets(jet.GetMomentum(), period, jet_pu_id )) continue;
+    // //     if(jet_to_exclude_indexes.count(n)) continue;
+    //     if(apply_pu && jet.GetMomentum().pt() < cuts::hh_bbtautau_2017::jetID::max_pt_veto && !(jet_pu_id.Passed(analysis::DiscriminatorWP::Loose))) continue;
+    //     if(std::abs(jet.GetMomentum().eta()) < low_eta_cut) continue;
+    //     if(pass_btag && !bTagger.Pass(event,n,unc_source,unc_scale,DiscriminatorWP::Medium)) continue;
+    //
+    //     jet_info_vector.emplace_back(jet.GetMomentum(),n,bTagger.BTag(event,n,unc_source,unc_scale,base_ordering));
+    // }
+    // auto jets_ordered = jet_ordering::OrderJets(jet_info_vector,true,pt_cut,eta_cut);
+    // for(size_t h = 0; h < jets_ordered.size(); ++h){
+    //     const JetCandidate& jet = all_jets.at(jets_ordered.at(h).index);
+    //     selected_jets.push_back(jet);
+    // }
+
+    hh_btag::HH_BTag test("/afs/cern.ch/work/m/mdidomen/hh-italian/Analysis_2018/CMSSW_10_2_16/src/hh-bbtautau/Studies/python/prova_pipo_v2_par1.pb");
+    // Lock lock(*mutex);
+    const std::vector<float> scores;
+    // const ntuple::Event& event = event_candidate.GetEvent();
+
+    // auto pt = event.
+
+    // if(!HasBjetPair())
+    //     throw exception("Can't retrieve KinFit results.");
+
+
+    return scores;
+}
+
+
 LorentzVector EventInfoBase::GetResonanceMomentum(bool useSVfit, bool addMET)
 {
     Lock lock(*mutex);

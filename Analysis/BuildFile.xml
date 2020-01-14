@@ -7,4 +7,5 @@
 <use name="h-tautau/Core"/>
 <use name="h-tautau/JetTools"/>
 <use name="h-tautau/Instruments"/>
+<use name="PhysicsTools/TensorFlow"/>
 <export> <lib name="1"/> </export>

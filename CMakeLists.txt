@@ -6,7 +6,7 @@ include("${AnalysisTools_DIR}/cmake/include/common.cmake")
 
 include("${AnalysisTools_DIR}/cmake/include/tensorflow.cmake")
 include_directories(SYSTEM ${CMSSW_RELEASE_BASE_SRC} ${TF_INCLUDES})
-target_link_libraries("nutella" ${TF_LIBRARIES})
+target_link_libraries("CacheTupleProducer" ${TF_LIBRARIES})
 
 file(GLOB_RECURSE ANA_TOOLS_SRC "${AnalysisTools_DIR}/*.cpp")
 add_library(AnalysisTools STATIC ${ANA_TOOLS_SRC} "${RootDict}")
