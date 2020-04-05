@@ -155,8 +155,6 @@ private:
                         if(!HH_indexes.count(hh_pair) && args.runKinFit() && event_info_base->HasBjetPair()){
                             cacheSummary().numberOfTimesKinFit++;
                             const kin_fit::FitResults& result = event_info_base->GetKinFitResults(true);
-                            const std::vector<float>& jet_scores = event_info_base->GetJetScore(20, 2.3,
-                                JetOrdering::DeepFlavour, true, true);
                             cacheTuple().kinFit_Higgs_index.push_back(selected_htt_index);
                             cacheTuple().kinFit_jetPairId.push_back(selected_hbb_index);
                             cacheTuple().kinFit_m.push_back(static_cast<Float_t>(result.mass));
@@ -164,6 +162,17 @@ private:
                             cacheTuple().kinFit_convergence.push_back(result.convergence);
                             cacheTuple().kinFit_unc_source.push_back(static_cast<Int_t>(unc_sources.at(source)));
                             cacheTuple().kinFit_unc_scale.push_back(variation);
+
+                            const std::vector<float>& jet_scores = event_info_base->GetJetScore(20, 2.3,
+                                JetOrdering::DeepFlavour, true, true);
+                            for (size_t i = 0; i < jet_scores.size(); ++i){
+                                cacheTuple().jet_hh_score_index.push_back(i);
+                                cacheTuple().jet_hh_score_value.push_back(jet_scores.at(i)); 
+                                cacheTuple().hh_htt_index.push_back(selected_htt_index);
+                                cacheTuple().jet_hh_score_unc_scale.push_back(static_cast<Int_t>(unc_sources.at(source)));
+                                cacheTuple().jet_hh_score_unc_source.push_back(variation);
+                            }
+
                             HH_indexes.insert(hh_pair);
                         }
 

@@ -180,6 +180,7 @@ private:
     std::shared_ptr<HiggsBBCandidate> higgs_bb;
     std::shared_ptr<kin_fit::FitResults> kinfit_results;
     std::shared_ptr<sv_fit_ana::FitResults> svfit_results;
+    std::vector<float> jet_score;
     boost::optional<double> mt2;
     double mva_score;
     std::shared_ptr<HiggsTTCandidate> higgs_tt, higgs_tt_sv;

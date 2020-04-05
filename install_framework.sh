@@ -132,6 +132,9 @@ run_cmd git clone -b run2_SFs git@github.com:cms-tau-pog/TauTriggerSFs.git TauAn
 # Recoil Corrections
 run_cmd git clone https://github.com/CMS-HTT/RecoilCorrections.git HTT-utilities/RecoilCorrections
 
+#HH-Btag
+run_cmd git clone https://github.com/hh-italian-group/HH-btag.git
+
 # Install analysis packages
 declare -A ANA_PACKAGES
 ANA_PACKAGES=( ["AnalysisTools"]="prod:master ana:master ana_osx:master" \
