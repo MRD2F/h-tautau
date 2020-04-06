@@ -15,7 +15,7 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 #include "h-tautau/JetTools/include/BTagger.h"
 #include "h-tautau/Analysis/include/EventCandidate.h"
 #include "h-tautau/Analysis/include/EventCacheProvider.h"
-#include "HH-btag/include/HH_BTag.h"
+#include "HHTools/HH-btag/include/HH_BTag.h"
 
 #include "SVfitAnaInterface.h"
 #include "KinFitInterface.h"

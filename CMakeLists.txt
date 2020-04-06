@@ -32,14 +32,14 @@ add_library(SVfit STATIC ${SVFIT_SRC})
 target_compile_definitions(SVfit PRIVATE USE_SVFITTF=1)
 set_source_files_properties(${SVFIT_SRC} PROPERTIES COMPILE_FLAGS "-w")
 
-file(GLOB_RECURSE HH-btag_SRC "${CMSSW_BASE_SRC}/HH-btag/src/*.cpp")
-add_library(HH-btag STATIC ${HH-btag_SRC})
-set_source_files_properties(${HH-btag_SRC} PROPERTIES COMPILE_FLAGS "-w")
+file(GLOB_RECURSE HHTools_SRC "${CMSSW_BASE_SRC}/HHTools/HH-btag/src/*.cpp")
+add_library(HHTools STATIC ${HHTools_SRC})
+set_source_files_properties(${HHTools_SRC} PROPERTIES COMPILE_FLAGS "-w")
 
 add_library(h-tautau STATIC ${SOURCE_LIST})
 
 foreach(exe_name ${EXE_LIST})
-    target_link_libraries("${exe_name}" h-tautau AnalysisTools HTT-utilities SVfit HH-btag HHKinFit2 TauAnalysisTools TauPOG)
+    target_link_libraries("${exe_name}" h-tautau AnalysisTools HTT-utilities SVfit HHTools HHKinFit2 TauAnalysisTools TauPOG)
 endforeach()
 
 set_target_properties(Print_Graph Print_Graph_2 Print_Graph_3 Print_TreeBranch2D PROPERTIES EXCLUDE_FROM_ALL 1)
