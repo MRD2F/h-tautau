@@ -97,6 +97,9 @@ run_cmd git clone git@github.com:hh-italian-group/HHKinFit2.git HHKinFit2/HHKinF
 run_cmd git clone git@github.com:hh-italian-group/LeptonEff-interface.git HTT-utilities
 run_cmd git clone git@github.com:hh-italian-group/LeptonEfficiencies.git HTT-utilities/LepEffInterface/data
 
+#HH-Btag
+run_cmd git clone https://github.com/hh-italian-group/HH-btag.git
+
 # Tau ID and Trigger SFs
 run_cmd git clone git@github.com:cms-tau-pog/TauIDSFs.git TauPOG/TauIDSFs
 run_cmd git clone -b run2_SFs git@github.com:cms-tau-pog/TauTriggerSFs.git TauAnalysisTools/TauTriggerSFs

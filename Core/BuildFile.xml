@@ -1,4 +1,5 @@
 <use name="boost"/>
 <use name="root"/>
 <use name="AnalysisTools/Core"/>
+<use name="PhysicsTools/TensorFlow"/>
 <export> <lib name="1"/> </export>

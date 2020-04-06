@@ -252,6 +252,78 @@ const sv_fit_ana::FitResults& EventInfo::GetSVFitResults(bool allow_calc, int ve
     return *svfit_results;
 }
 
+const std::vector<float>& EventInfo::GetJetScore(double pt_cut, double eta_cut, JetOrdering jet_ordering, bool apply_pu, bool pass_btag,
+                                                    double low_eta_cut, analysis::UncertaintySource unc_source,
+                                                    analysis::UncertaintyScale unc_scale )
+{
+   Lock lock(*mutex);
+   const ntuple::Event& event = event_candidate.GetEvent();
+   const auto& jets = SelectJets(pt_cut, eta_cut, true, false, jet_ordering);
+
+   std::vector<float> jet_pt = {};
+   std::vector<float> jet_eta = {};
+   std::vector<float> rel_jet_M_pt = {};
+   std::vector<float> rel_jet_E_pt = {};
+   std::vector<float> jet_htt_deta = {};
+   std::vector<float> jet_deepFlavour = {};
+   std::vector<float> jet_htt_dphi = {};
+
+   float sample_year = 0;
+   float channelId = 0;
+
+   float htt_scalar_pt = event.lep_p4.at(0).Pt() + event.lep_p4.at(1).Pt();
+
+   auto htt_p4 = event.lep_p4.at(0) + event.lep_p4.at(1);
+   float htt_pt = htt_p4.Pt();
+   float htt_eta = htt_p4.Eta();
+   float htt_met_dphi = ROOT::Math::VectorUtil::DeltaPhi(event.pfMET_p4, htt_p4);
+   float rel_met_pt_htt_pt = event.pfMET_p4.Pt() / htt_pt;
+
+
+   // std::vector<float> htt_pt = {htt_p4.Pt()};
+   // std::vector<float> htt_eta = {htt_p4.Eta()};
+   // std::vector<float> htt_met_dphi = {ROOT::Math::VectorUtil::DeltaPhi(event.pfMET_p4, htt_p4)};
+   // std::vector<float> rel_met_pt_htt_pt = {event.pfMET_p4.Pt() / htt_p4.Pt()};
+
+   // std::cout << "jets.size()=" << std::min(jets.size(), 10) << "\n";
+   for (size_t i = 0; i < jets.size(); i++) {
+       auto jets_p4 = jets.at(i)->p4();
+       jet_pt.push_back(jets_p4.Pt());
+       jet_eta.push_back(jets_p4.Eta());
+       rel_jet_M_pt.push_back(jets_p4.M() / jets_p4.Pt());
+       rel_jet_E_pt.push_back(jets_p4.E() / jets_p4.Pt());
+       jet_htt_deta.push_back(htt_p4.eta() - jets_p4.Eta());
+       jet_htt_dphi.push_back(ROOT::Math::VectorUtil::DeltaPhi(htt_p4, jets_p4));
+
+       jet_deepFlavour.push_back(event.jets_deepFlavour_b.at(i) + event.jets_deepFlavour_bb.at(i) +
+                                 event.jets_deepFlavour_lepb.at(i));
+   }
+
+   hh_btag::HH_BTag test("/afs/cern.ch/work/m/mdidomen/hh-italian/Analysis_2018/CMSSW_10_2_16/src/hh-bbtautau/Studies/python/prova_pipo_v2_par1.pb");
+
+   // float jet_size = .;
+   auto scores = test.HH_BTag::GetScore(jet_pt, jet_eta, rel_jet_M_pt, rel_jet_E_pt, jet_htt_deta,
+                                          jet_deepFlavour, jet_htt_dphi, sample_year, channelId, htt_pt, htt_eta, htt_met_dphi,
+                                          rel_met_pt_htt_pt, htt_scalar_pt, jets.size());
+   // test.hello();
+   // auto scores = test.GetScore();
+   // Lock lock(*mutex);
+    // std::vector<float> scores;
+   // std::vector<float> scores;
+   // const ntuple::Event& event = event_candidate.GetEvent();
+
+   // auto pt = event.
+
+   // if(!HasBjetPair())
+   //     throw exception("Can't retrieve KinFit results.");
+   float jet_size =jets.size();
+   jet_score = test.HH_BTag::GetScore(jet_pt, jet_eta, rel_jet_M_pt, rel_jet_E_pt, jet_htt_deta,
+                                          jet_deepFlavour, jet_htt_dphi, sample_year, channelId, htt_pt, htt_eta, htt_met_dphi,
+                                          rel_met_pt_htt_pt, htt_scalar_pt, jet_size);
+
+   return jet_score;
+}
+
 LorentzVector EventInfo::GetResonanceMomentum(bool useSVfit, bool addMET, bool allow_calc)
 {
     Lock lock(*mutex);

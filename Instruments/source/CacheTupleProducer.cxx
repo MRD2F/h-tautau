@@ -9,6 +9,7 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 #include "h-tautau/Core/include/CacheTuple.h"
 #include "h-tautau/Core/include/EventTuple.h"
 #include "h-tautau/Analysis/include/SignalObjectSelector.h"
+#include "h-tautau/Cuts/include/hh_bbtautau_Run2.h"
 #include <ctime>
 #include <chrono>
 
@@ -179,15 +180,25 @@ private:
                             cacheTuple().kinFit_convergence.push_back(result.convergence);
                             cacheTuple().kinFit_unc_source.push_back(static_cast<Int_t>(unc_sources.at(source)));
                             cacheTuple().kinFit_unc_scale.push_back(variation);
+
+                            const std::vector<float>& jet_scores = event_info_base->GetJetScore(cuts::hh_bbtautau_Run2::jetID::pt,
+                                                                                                2.3,
+                                                                                                JetOrdering::DeepFlavour,
+                                                                                                true, true);
+                            for (size_t i = 0; i < jet_scores.size(); ++i){
+                                cacheTuple().jet_hh_score_index.push_back(i);
+                                cacheTuple().jet_hh_score_value.push_back(jet_scores.at(i));
+                                cacheTuple().hh_htt_index.push_back(selected_htt_index);
+                                cacheTuple().jet_hh_score_unc_scale.push_back(static_cast<Int_t>(unc_sources.at(source)));
+                                cacheTuple().jet_hh_score_unc_source.push_back(variation);
+                            }
+
                             HH_indexes.insert(hh_pair);
                         }
-
                     }
                 }
             }
-
         }
-
     }
 
 private:

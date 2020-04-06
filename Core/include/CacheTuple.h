@@ -36,6 +36,7 @@ using LorentzVectorM = analysis::LorentzVectorM;
     VAR(std::vector<Int_t>, jet_hh_score_unc_scale) /* jet score scale */ \
     VAR(std::vector<Int_t>, jet_hh_score_unc_source) /* jet score source */ \
     VAR(std::vector<Float_t>, jet_hh_score_value) /* jet score value */ \
+    VAR(std::vector<Float_t>, hh_htt_index) /* jet score value */ \
     /**/
 
 #define VAR(type, name) DECLARE_BRANCH_VARIABLE(type, name)

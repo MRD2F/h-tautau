@@ -57,11 +57,12 @@ namespace analysis {
         return unc_scale < other.unc_scale;
     }
 
-    EventCacheProvider::JetScoreKey::JetScoreKey() : jet_index(0),
+    EventCacheProvider::JetScoreKey::JetScoreKey() : jet_index(0),// htt_index(0),
             unc_source(UncertaintySource::None), unc_scale(UncertaintyScale::Central) { }
 
-    EventCacheProvider::JetScoreKey::JetScoreKey(size_t _jet_index,UncertaintySource _unc_source,UncertaintyScale _unc_scale) :
-            jet_index(_jet_index), unc_source(_unc_source), unc_scale(_unc_scale) { }
+    EventCacheProvider::JetScoreKey::JetScoreKey(size_t _jet_index /*, size_t _htt_index*/, UncertaintySource _unc_source,
+                                                 UncertaintyScale _unc_scale) :
+            jet_index(_jet_index)/*, htt_index(_htt_index)*/, unc_source(_unc_source), unc_scale(_unc_scale) { }
 
     bool EventCacheProvider::JetScoreKey::JetScoreKey::operator<(const JetScoreKey& other) const
     {

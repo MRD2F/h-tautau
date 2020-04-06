@@ -15,6 +15,7 @@ This file is part of https://github.com/hh-italian-group/h-tautau. */
 #include "h-tautau/JetTools/include/BTagger.h"
 #include "h-tautau/Analysis/include/EventCandidate.h"
 #include "h-tautau/Analysis/include/EventCacheProvider.h"
+#include "HH-btag/include/HH_BTag.h"
 
 #include "SVfitAnaInterface.h"
 #include "KinFitInterface.h"
@@ -107,6 +108,11 @@ public:
     const kin_fit::FitResults& GetKinFitResults(bool allow_calc = false, int verbosity = 0);
     const sv_fit_ana::FitResults& GetSVFitResults(bool allow_calc = false, int verbosity = 0);
 
+    const std::vector<float>& GetJetScore(double pt_cut, double eta_cut, JetOrdering jet_ordering,
+                                          bool apply_pu, bool pass_btag, double low_eta_cut = 0,
+                                          analysis::UncertaintySource unc_source = analysis::UncertaintySource::None,
+                                          analysis::UncertaintyScale unc_scale = analysis::UncertaintyScale::Central);
+
     LorentzVector GetResonanceMomentum(bool useSVfit, bool addMET, bool allow_calc = false);
     double GetMT2();
     const FatJetCandidate* SelectFatJet(double mass_cut, double deltaR_subjet_cut);
@@ -169,6 +175,7 @@ private:
     std::shared_ptr<HiggsBBCandidate> higgs_bb;
     std::shared_ptr<kin_fit::FitResults> kinfit_results;
     std::shared_ptr<sv_fit_ana::FitResults> svfit_results;
+    std::vector<float> jet_score;
     boost::optional<double> mt2;
     double mva_score;
     std::shared_ptr<HiggsTTCandidate> higgs_tt, higgs_tt_sv;
