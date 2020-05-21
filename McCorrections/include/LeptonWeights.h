@@ -145,11 +145,15 @@ public:
                   const std::string& muon_SingletriggerInput, const std::string& muon_CrossTriggerInput,
                   const std::string& tauTriggerInput, Period period, DiscriminatorWP _tau_iso_wp);
 
-    double GetTriggerWeight(EventInfo& eventInfo, UncertaintySource unc_source, UncertaintyScale unc_scale) const;
-    double GetIdIsoWeight(EventInfo& eventInfo, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp, DiscriminatorWP VSjet_wp,
-                          UncertaintySource unc_source, UncertaintyScale unc_scale) const;
+    std::shared_ptr<TauIDSFTool>& GetTauIdProvider(TauIdDiscriminator discr, DiscriminatorWP wp, Period period);
+
     double GetLegIdIsoWeight(LepCandidate leg, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp, DiscriminatorWP VSjet_wp,
-                             UncertaintySource unc_source, UncertaintyScale unc_scale) const;
+                             Period period, UncertaintySource unc_source, UncertaintyScale unc_scale);
+
+    double GetIdIsoWeight(EventInfo& eventInfo, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp, DiscriminatorWP VSjet_wp,
+                          Period period, UncertaintySource unc_source, UncertaintyScale unc_scale);
+
+    double GetTriggerWeight(EventInfo& eventInfo, UncertaintyScale unc_scale) const ;
 
 
     virtual double Get(EventInfo& eventInfo) const override;
@@ -163,11 +167,14 @@ private:
     std::shared_ptr<tau_trigger::SFProvider> tauTriggerWeight_eTau;
     std::shared_ptr<tau_trigger::SFProvider> tauTriggerWeight_muTau;
     std::shared_ptr<tau_trigger::SFProvider> tauTriggerWeight_tauTau;
-    std::shared_ptr<TauIDSFTool> tauIdWeight;
+    // std::shared_ptr<TauIDSFTool> tauIdWeight;
     std::shared_ptr<TauIDSFTool> tauTriggerWeight_Vse;
     std::shared_ptr<TauIDSFTool> tauTriggerWeight_Vsmu;
     Period period;
     DiscriminatorWP tau_iso_wp;
+    // std::map<, DiscriminatorWP, std::shared_ptr<TauIDSFTool>> tau_sf_providers;
+
+    std::map<TauIdDiscriminator, std::map<DiscriminatorWP, std::shared_ptr<TauIDSFTool>>> tau_sf_providers;
 };
 
 } // namespace mc_corrections

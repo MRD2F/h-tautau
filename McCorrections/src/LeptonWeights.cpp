@@ -65,23 +65,6 @@ LeptonWeights::LeptonWeights(const std::string& electron_idIsoInput, const std::
     muonSF(muon_idIsoInput, muon_SingletriggerInput, muon_CrossTriggerInput), period(_period),
     tau_iso_wp(_tau_iso_wp)
 {
-    if(period == Period::Run2016){
-        tauIdWeight = std::make_shared<TauIDSFTool>("2016Legacy","DeepTau2017v2p1VSjet", ToString(tau_iso_wp), false);
-        tauTriggerWeight_Vse = std::make_shared<TauIDSFTool>("2016Legacy","DeepTau2017v2p1VSe", ToString(tau_iso_wp) , false, false);
-        tauTriggerWeight_Vsmu = std::make_shared<TauIDSFTool>("2016Legacy","DeepTau2017v2p1VSmu", ToString(tau_iso_wp) , false, false);
-    }
-    else if(period == Period::Run2017){
-        tauIdWeight = std::make_shared<TauIDSFTool>("2017ReReco","DeepTau2017v2p1VSjet", ToString(tau_iso_wp), false);
-        tauTriggerWeight_Vse = std::make_shared<TauIDSFTool>("2017ReReco","DeepTau2017v2p1VSe", ToString(tau_iso_wp) , false);
-        tauTriggerWeight_Vsmu = std::make_shared<TauIDSFTool>("2017ReReco","DeepTau2017v2p1VSmu", ToString(tau_iso_wp) , false, false);
-    }
-    else if(period == Period::Run2018){
-        tauIdWeight = std::make_shared<TauIDSFTool>("2018ReReco","DeepTau2017v2p1VSjet", ToString(tau_iso_wp),false);
-        tauTriggerWeight_Vse = std::make_shared<TauIDSFTool>("2018ReReco","DeepTau2017v2p1VSe", ToString(tau_iso_wp) , false, false);
-        tauTriggerWeight_Vsmu = std::make_shared<TauIDSFTool>("2018ReReco","DeepTau2017v2p1VSmu", ToString(tau_iso_wp) , false, false);
-    }
-    else
-        throw exception("Period %1% is not supported.") % period;
 
     tauTriggerWeight_eTau = std::make_shared<tau_trigger::SFProvider>(tauTriggerInput, "etau", ToString(tau_iso_wp));
     tauTriggerWeight_muTau = std::make_shared<tau_trigger::SFProvider>(tauTriggerInput, "mutau", ToString(tau_iso_wp));
@@ -89,31 +72,60 @@ LeptonWeights::LeptonWeights(const std::string& electron_idIsoInput, const std::
                                                                         ToString(tau_iso_wp));
 }
 
+std::shared_ptr<TauIDSFTool>& LeptonWeights::GetTauIdProvider(TauIdDiscriminator discr, DiscriminatorWP wp, Period period)
+{
+    std::map<Period ,std::string>  period_label = { { Period::Run2016, "2016Legacy" },
+                                                     { Period::Run2017, "2017ReReco" },
+                                                     { Period::Run2018, "2018ReReco" } };
+    std::string s = "by";
+    std::string::size_type i = ToString(discr).find(s);
+
+    tau_sf_providers[discr][wp] = std::make_shared<TauIDSFTool>(period_label.at(period),
+                                ToString(discr).erase(i, s.length()), ToString(wp), false, false);
+    return tau_sf_providers[discr][wp];
+}
+
+double LeptonWeights::GetLegIdIsoWeight(LepCandidate leg, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp,
+                                        DiscriminatorWP VSjet_wp, Period period,
+                                        UncertaintySource /*unc_source*/, UncertaintyScale /*unc_scale*/)
+{
+    std::map<LegType, std::pair<TauIdDiscriminator,DiscriminatorWP>> leg_wp_disc = {
+         { LegType::e, { TauIdDiscriminator::byDeepTau2017v2p1VSe, VSe_wp } },
+         { LegType::mu, { TauIdDiscriminator::byDeepTau2017v2p1VSmu, VSmu_wp } },
+         { LegType::tau, { TauIdDiscriminator::byDeepTau2017v2p1VSjet, VSjet_wp } }
+     };
+
+
+    auto tauIdWeight = GetTauIdProvider(leg_wp_disc.at(leg->leg_type()).first, leg_wp_disc.at(leg->leg_type()).second,
+                                        period);
+
+    if(leg->leg_type() == LegType::e){
+        double tau_id_weight = tauIdWeight->getSFvsEta(leg.GetMomentum().eta(), static_cast<int>(leg->gen_match()));
+        return electronSF.GetIdIsoSF(leg.GetMomentum()) * tau_id_weight;
+    }
+    else if(leg->leg_type() == LegType::mu){
+        double tau_id_weight = tauIdWeight->getSFvsEta(leg.GetMomentum().eta(), static_cast<int>(leg->gen_match()));
+        return  muonSF.GetIdIsoSF(leg.GetMomentum()) * tau_id_weight;
+    }
+    else if(leg->leg_type() == LegType::tau){
+        double tau_id_weight = tauIdWeight->getSFvsPT(leg.GetMomentum().pt(), static_cast<int>(leg->gen_match()));
+        return tau_id_weight;
+    }
+    else
+        throw exception("Leg type not found.");
+}
+
 double LeptonWeights::GetIdIsoWeight(EventInfo& eventInfo, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp,
-                                     DiscriminatorWP VSjet_wp, UncertaintySource unc_source,
-                                     UncertaintyScale unc_scale) const
+                                     DiscriminatorWP VSjet_wp, Period period, UncertaintySource unc_source,
+                                     UncertaintyScale unc_scale)
 {
     double weight = 1;
     for(size_t leg_id = 1; leg_id <= 2; ++leg_id)
-        weight *= GetLegIdIsoWeight(eventInfo.GetLeg(leg_id), VSe_wp, VSmu_wp, VSjet_wp, unc_source, unc_scale);
+        weight *= GetLegIdIsoWeight(eventInfo.GetLeg(leg_id), VSe_wp, VSmu_wp, VSjet_wp, period, unc_source, unc_scale);
     return weight;
 }
 
-double LeptonWeights::GetLegIdIsoWeight(LepCandidate leg, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp, DiscriminatorWP VSjet_wp,
-                                        UncertaintySource unc_source, UncertaintyScale unc_scale) const
-{
-    if(leg->leg_type() == LegType::e)
-        return electronSF.GetIdIsoSF(leg.GetMomentum()) *
-               tauTriggerWeight_Vse->getSFvsEta(leg.GetMomentum().eta(), static_cast<int>(leg->gen_match()));
-    else if(leg->leg_type() == LegType::mu)
-        return  muonSF.GetIdIsoSF(leg.GetMomentum()) *
-                tauTriggerWeight_Vsmu->getSFvsEta(leg.GetMomentum().eta(), static_cast<int>(leg->gen_match()));
-    else if(leg->leg_type() == LegType::tau)
-        return tauIdWeight->getSFvsPT(leg.GetMomentum().pt(), static_cast<int>(leg->gen_match()));
-
-}
-
-double LeptonWeights::GetTriggerWeight(EventInfo& eventInfo, UncertaintySource unc_source, UncertaintyScale unc_scale) const
+double LeptonWeights::GetTriggerWeight(EventInfo& eventInfo, UncertaintyScale unc_scale) const
 {
     const ntuple::Event& event = *eventInfo;
     const double eff_data = GetTriggerEfficiency(eventInfo, true, unc_scale);
@@ -128,10 +140,9 @@ double LeptonWeights::GetTriggerWeight(EventInfo& eventInfo, UncertaintySource u
 }
 
 
-double LeptonWeights::Get(EventInfo& eventInfo) const
+double LeptonWeights::Get(EventInfo& /*eventInfo*/) const
 {
     throw exception("Function LeptonWeights::Get no longer suits our needs.");
-    // return GetIdIsoWeight(eventInfo) * GetTriggerWeight(eventInfo);
 }
 
 double LeptonWeights::Get(const ntuple::ExpressEvent& /*event*/) const
@@ -153,9 +164,7 @@ double LeptonWeights::GetTriggerEfficiency(EventInfo& eventInfo, bool isData, Un
     static constexpr double prescaled_weight_IsoMu22_eta2p1_2016 = 0.9237823527;
 
     //2017
-    // static const std::vector<std::string> triggerPaths_Prescaled_eTau_2017 = {"HLT_Ele32_WPTight_Gsf_v"};
     static const std::vector<std::string> triggerPaths_Prescaled_muTau_2017 = {"HLT_IsoMu24_v"};
-    static constexpr double prescaled_weight_eTau_2017 = 0.6530857451;
     static constexpr double prescaled_weight_muTau_2017 = 0.9161390096;
 
     if(channel == Channel::ETau) {
@@ -175,18 +184,9 @@ double LeptonWeights::GetTriggerEfficiency(EventInfo& eventInfo, bool isData, Un
             static const std::vector<std::string> triggerPaths_unPrescaled_2017 = {
                 "HLT_Ele35_WPTight_Gsf_v", "HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTau30_eta2p1_CrossL1_v" };
 
-            // if(period == Period::Run2017 && !eventInfo.GetTriggerResults().AnyAcceptAndMatch(triggerPaths_unPrescaled_2017)
-            //         && eventInfo.GetTriggerResults().AnyAcceptAndMatch(triggerPaths_Prescaled_eTau_2017))
-            //     prescaled_weight = prescaled_weight_eTau_2017;
             return prescaled_weight * std::min(ele_single_eff * (1 - tau_eff) + ele_cross_eff * tau_eff, 1.);
         }
         else {
-            // static const std::vector<std::string> triggerPaths_unPrescaled_2017 = {
-            //     "HLT_Ele35_WPTight_Gsf_v"};
-            // if(period == Period::Run2017
-            //         && !eventInfo.GetTriggerResults().AnyAcceptAndMatch(triggerPaths_unPrescaled_2017)
-            //         && eventInfo.GetTriggerResults().AnyAcceptAndMatch(triggerPaths_Prescaled_eTau_2017))
-            //     prescaled_weight = prescaled_weight_eTau_2017;
             return prescaled_weight * electronSF.GetTriggerEff(eventInfo.GetLeg(1).GetMomentum(), isData);
         }
 
