@@ -145,14 +145,18 @@ public:
                   const std::string& muon_SingletriggerInput, const std::string& muon_CrossTriggerInput,
                   const std::string& tauTriggerInput, Period period, DiscriminatorWP _tau_iso_wp);
 
-    double GetIdIsoWeight(EventInfo& eventInfo) const;
-    double GetTriggerWeight(EventInfo& eventInfo) const;
+    double GetTriggerWeight(EventInfo& eventInfo, UncertaintySource unc_source, UncertaintyScale unc_scale) const;
+    double GetIdIsoWeight(EventInfo& eventInfo, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp, DiscriminatorWP VSjet_wp,
+                          UncertaintySource unc_source, UncertaintyScale unc_scale) const;
+    double GetLegIdIsoWeight(LepCandidate leg, DiscriminatorWP VSe_wp, DiscriminatorWP VSmu_wp, DiscriminatorWP VSjet_wp,
+                             UncertaintySource unc_source, UncertaintyScale unc_scale) const;
+
 
     virtual double Get(EventInfo& eventInfo) const override;
     virtual double Get(const ntuple::ExpressEvent& /*event*/) const override;
 
 private:
-    double GetTriggerEfficiency(EventInfo& eventInfo, bool isData) const;
+    double GetTriggerEfficiency(EventInfo& eventInfo, bool isData, UncertaintyScale unc_scale) const;
 
 private:
     detail::LeptonScaleFactors electronSF, muonSF;
@@ -160,6 +164,8 @@ private:
     std::shared_ptr<tau_trigger::SFProvider> tauTriggerWeight_muTau;
     std::shared_ptr<tau_trigger::SFProvider> tauTriggerWeight_tauTau;
     std::shared_ptr<TauIDSFTool> tauIdWeight;
+    std::shared_ptr<TauIDSFTool> tauTriggerWeight_Vse;
+    std::shared_ptr<TauIDSFTool> tauTriggerWeight_Vsmu;
     Period period;
     DiscriminatorWP tau_iso_wp;
 };
